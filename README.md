@@ -39,8 +39,8 @@
   <p align="center">
     The CVSS Typst Library is a <a href="https://github.com/typst/">Typst</a> package designed to facilitate the calculation of Common Vulnerability Scoring System (CVSS) scores for vulnerabilities across multiple versions, including CVSS 2.0, 3.0, 3.1, and 4.0. This library provides developers, security analysts, and researchers with a reliable and efficient toolset for assessing the severity of security vulnerabilities based on the CVSS standards.
     <br />
-    <a href="https://github.com/DrakeAxelrod/cvssc"><strong>Explore the docs »</strong></a>
-    <br />
+    <!-- <a href="https://github.com/DrakeAxelrod/cvssc"><strong>Explore the docs »</strong></a> -->
+    <!-- <br /> -->
     <br />
     <!-- <a href="https://github.com/DrakeAxelrod/cvssc">View Tests</a>
     · -->
