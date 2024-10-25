@@ -34,19 +34,19 @@
     <img src="resources/svg/logo.svg" alt="Logo" width="160" height="160">
   </a> -->
 
-<h3 align="center">cvss.typ</h3>
+<h3 align="center">cvssc</h3>
 
   <p align="center">
     The CVSS Typst Library is a <a href="https://github.com/typst/">Typst</a> package designed to facilitate the calculation of Common Vulnerability Scoring System (CVSS) scores for vulnerabilities across multiple versions, including CVSS 2.0, 3.0, 3.1, and 4.0. This library provides developers, security analysts, and researchers with a reliable and efficient toolset for assessing the severity of security vulnerabilities based on the CVSS standards.
     <br />
-    <a href="https://github.com/DrakeAxelrod/cvss.typ"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/DrakeAxelrod/cvssc"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <!-- <a href="https://github.com/DrakeAxelrod/cvss.typ">View Tests</a>
     · -->
-    <a href="https://github.com/DrakeAxelrod/cvss.typ/issues">Report Bug</a>
+    <a href="https://github.com/DrakeAxelrod/cvssc/issues">Report Bug</a>
     ·
-    <a href="https://github.com/DrakeAxelrod/cvss.typ/issues">Request Feature</a>
+    <a href="https://github.com/DrakeAxelrod/cvssc/issues">Request Feature</a>
   </p>
 </div>
 
@@ -83,19 +83,15 @@
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 ```typ
-#import "@preview/cvss:0.1.0": score, severity, parse, re, NONE, LOW, MEDIUM, HIGH, CRITICAL;
+#import "@preview/cvssc:0.1.0": v2, v3, v4;
 
-#score("CVSS:2.0/AV:L/AC:H/Au:M/C:P/I:C/A:C") // => 5.6
-#severity("CVSS:2.0/AV:L/AC:H/Au:M/C:P/I:C/A:C") // => "Medium"
+#v2("CVSS:2.0/AV:L/AC:H/Au:M/C:P/I:C/A:C")
 
-#score("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H") // => 9.8
-#severity("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H") // => "Critical"
+#v3("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")
 
-#score("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H") // => 8.6
-#severity("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H") // => "High"
+#v3("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H")
 
-#score("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L") // => 5.3
-#severity("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L") // => "Medium"
+#v4("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L")
 ```
 
 <!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description` -->
@@ -129,71 +125,29 @@ Ensure you have the Typst CLI installed.
 1. Import the package
 
 ```typ
-#import "@preview/cvss:0.1.0";
+#import "@preview/cvssc:0.1.0";
 ```
 
 2. Use the various library functions to calculate CVSS scores and severities.
 
 ```typ
-#import "@preview/cvss:0.1.0";
+#import "@preview/cvssc:0.1.0";
 
-#cvss.score("CVSS:2.0/AV:L/AC:H/Au:M/C:P/I:C/A:C") // => 5.6
-#cvss.severity("CVSS:2.0/AV:L/AC:H/Au:M/C:P/I:C/A:C") // => "Medium"
+#cvssc.v2("CVSS:2.0/AV:L/AC:H/Au:M/C:P/I:C/A:C")
 
-#cvss.score("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H") // => 9.8
-#cvss.severity("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H") // => "Critical"
+#cvssc.v3("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")
 
-#cvss.score("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H") // => 8.6
-#cvss.severity("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H") // => "High"
+#cvssc.v3("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H")
 
-#cvss.score("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L") // => 5.3
-#cvss.severity("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L") // => "Medium"
+#cvssc.v4("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L")
 ```
 
-3. the library has pseudo constants for the various severity levels.
-
-```typ
-#cvss.NONE => "None"
-#cvss.LOW => "Low"
-#cvss.MEDIUM => "Medium"
-#cvss.HIGH => "High"
-#cvss.CRITICAL => "Critical"
-```
-
-4. The library also provides a `parse` function to parse a CVSS string into a structured object.
-
-```typ
-#cvss.parse("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H")
-// (
-//  score: 8.6,
-//  severity: "High",
-//  metrics: (
-//     AV: "N",
-//     AC: "L",
-//     PR: "N",
-//     UI: "N",
-//     S: "U",
-//     C: "L",
-//     I: "L",
-//     A: "H"
-//     version: "3.1"
-//   )
-// )
-```
 
 all functions / variables contained in the library are the following:
 
-- `score` - a function that takes a CVSS string and returns the CVSS score as a float.
-- `severity` - a function that takes a CVSS string and returns the CVSS severity as a string.
-- `metrics` - a function that takes a CVSS string and returns the CVSS metrics as a structured object.
-- `parse` - a function that takes a CVSS string and returns a structured object containing the CVSS score, severity, and metrics.
-- `verify` - a function that takes a CVSS string and returns a boolean indicating whether the string is a valid CVSS string.
-- `NONE` - a pseudo constant representing the "None" severity level.
-- `LOW` - a pseudo constant representing the "Low" severity level.
-- `MEDIUM` - a pseudo constant representing the "Medium" severity level.
-- `HIGH` - a pseudo constant representing the "High" severity level.
-- `CRITICAL` - a pseudo constant representing the "Critical" severity level.
-- `re` - a regular expression object used to parse CVSS strings.
+- `v2` - a function that takes a cvss version 2 string and returns an object containing the CVSS score and severity, and metrics.
+- `v3` - a function that takes a cvss version 3 string and returns an object containing the CVSS score and severity, and metrics.
+- `v4` - a function that takes a cvss version 4 string and returns an object containing the CVSS score and severity, and metrics.
 
 ### Prerequisites
 
@@ -223,7 +177,7 @@ This is an example of how to list things you need to use the software and how to
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+<!-- Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources. -->
 
 _For more examples, please refer to the [Examples](./src/examples.pdf)_
 
