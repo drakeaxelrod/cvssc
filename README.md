@@ -30,7 +30,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <!-- <a href="https://github.com/DrakeAxelrod/cvss.typ">
+  <!-- <a href="https://github.com/DrakeAxelrod/cvssc">
     <img src="resources/svg/logo.svg" alt="Logo" width="160" height="160">
   </a> -->
 
@@ -42,7 +42,7 @@
     <a href="https://github.com/DrakeAxelrod/cvssc"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <!-- <a href="https://github.com/DrakeAxelrod/cvss.typ">View Tests</a>
+    <!-- <a href="https://github.com/DrakeAxelrod/cvssc">View Tests</a>
     · -->
     <a href="https://github.com/DrakeAxelrod/cvssc/issues">Report Bug</a>
     ·
@@ -160,7 +160,7 @@ This is an example of how to list things you need to use the software and how to
 <!-- 1. Get a free API Key at [https://example.com](https://example.com)
 2. Clone the repo
    ```sh
-   git clone https://github.com/DrakeAxelrod/cvss.typ.git
+   git clone https://github.com/DrakeAxelrod/cvssc.git
    ```
 3. Install NPM packages
    ```sh
@@ -194,7 +194,7 @@ _For more examples, please refer to the [Examples](./src/examples.pdf)_
   - [ ] Nested Feature
 -->
 
-See the [open issues](https://github.com/DrakeAxelrod/cvss.typ/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/DrakeAxelrod/cvssc/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -231,7 +231,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Drake Axelrod - [Github Profile](<[https://github/](https://github.com/DrakeAxelrod/)>) - drakeaxelrod@gmail.com
 
-Project Link: [https://github.com/DrakeAxelrod/cvss.typ](https://github.com/DrakeAxelrod/cvss.typ)
+Project Link: [https://github.com/DrakeAxelrod/cvssc](https://github.com/DrakeAxelrod/cvssc)
 
 ## Contributors
 
@@ -258,16 +258,16 @@ Project Link: [https://github.com/DrakeAxelrod/cvss.typ](https://github.com/Drak
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/DrakeAxelrod/cvss.typ.svg?style=for-the-badge
-[contributors-url]: https://github.com/DrakeAxelrod/cvss.typ/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/DrakeAxelrod/cvss.typ.svg?style=for-the-badge
-[forks-url]: https://github.com/DrakeAxelrod/cvss.typ/network/members
-[stars-shield]: https://img.shields.io/github/stars/DrakeAxelrod/cvss.typ.svg?style=for-the-badge
-[stars-url]: https://github.com/DrakeAxelrod/cvss.typ/stargazers
-[issues-shield]: https://img.shields.io/github/issues/DrakeAxelrod/cvss.typ.svg?style=for-the-badge
-[issues-url]: https://github.com/DrakeAxelrod/cvss.typ/issues
-[license-shield]: https://img.shields.io/github/license/DrakeAxelrod/cvss.typ.svg?style=for-the-badge
-[license-url]: https://github.com/DrakeAxelrod/cvss.typ/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/DrakeAxelrod/cvssc.svg?style=for-the-badge
+[contributors-url]: https://github.com/DrakeAxelrod/cvssc/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/DrakeAxelrod/cvssc.svg?style=for-the-badge
+[forks-url]: https://github.com/DrakeAxelrod/cvssc/network/members
+[stars-shield]: https://img.shields.io/github/stars/DrakeAxelrod/cvssc.svg?style=for-the-badge
+[stars-url]: https://github.com/DrakeAxelrod/cvssc/stargazers
+[issues-shield]: https://img.shields.io/github/issues/DrakeAxelrod/cvssc.svg?style=for-the-badge
+[issues-url]: https://github.com/DrakeAxelrod/cvssc/issues
+[license-shield]: https://img.shields.io/github/license/DrakeAxelrod/cvssc.svg?style=for-the-badge
+[license-url]: https://github.com/DrakeAxelrod/cvssc/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
