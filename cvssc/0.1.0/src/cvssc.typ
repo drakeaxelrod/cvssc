@@ -1,7 +1,8 @@
 #let cvssc = plugin("cvssc.wasm")
 
-#let fix(dict) = {
-  dict.pairs().fold((:), (db, it) => {
+#let fix(input) = {
+  if type(input) != "dict" { return input }
+  input.pairs().fold((:), (db, it) => {
     let (k, v) = it
     k = k.clusters().fold("", (s, it) => {
       if it.match(regex("[A-Z]")) != none {
@@ -37,12 +38,16 @@
 
 #let v2(vec) = {
   let result = fix(cbor.decode(cvssc.v2(bytes(vec))))
-  if result.base-score < 4.0 {
-    result.base-severity = "LOW"
-  } else if result.base-score < 7.0 {
-    result.base-severity = "MEDIUM"
+  if "error" in result {
+    return result
   } else {
-    result.base-severity = "HIGH"
+    if result.base-score < 4.0 {
+      result.base-severity = "LOW"
+    } else if result.base-score < 7.0 {
+      result.base-severity = "MEDIUM"
+    } else {
+      result.base-severity = "HIGH"
+    }
   }
   result
 }
