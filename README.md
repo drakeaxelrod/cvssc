@@ -153,7 +153,7 @@ Ensure you have the Typst CLI installed.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
+<!-- This is an example of how to list things you need to use the software and how to install them. -->
 
 - typst (see [Typst](https://typst.app/))
 
