@@ -1,1 +1,1 @@
-#import "cvssc.typ": v2, v3, v4
+#import "cvssc.typ": *;

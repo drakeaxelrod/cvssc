@@ -39,8 +39,8 @@
   <p align="center">
     The CVSS Typst Library is a <a href="https://github.com/typst/">Typst</a> package designed to facilitate the calculation of Common Vulnerability Scoring System (CVSS) scores for vulnerabilities across multiple versions, including CVSS 2.0, 3.0, 3.1, and 4.0. This library provides developers, security analysts, and researchers with a reliable and efficient toolset for assessing the severity of security vulnerabilities based on the CVSS standards.
     <br />
-    <!-- <a href="https://github.com/DrakeAxelrod/cvssc"><strong>Explore the docs »</strong></a> -->
-    <!-- <br /> -->
+    <a href="https://github.com/DrakeAxelrod/cvssc/tree/main/cvssc/0.1.0/src/docs.pdf"><strong>Explore the docs »</strong></a>
+    <br />
     <br />
     <!-- <a href="https://github.com/DrakeAxelrod/cvssc">View Tests</a>
     · -->
@@ -78,10 +78,11 @@
 
 <!-- ABOUT THE PROJECT -->
 
-## About The Project
+<!-- ## About The Project -->
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
+<!--
 ```typ
 #import "@preview/cvssc:0.1.0": v2, v3, v4;
 
@@ -93,6 +94,7 @@
 
 #v4("CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:L")
 ```
+-->
 
 <!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description` -->
 
@@ -143,11 +145,11 @@ Ensure you have the Typst CLI installed.
 ```
 
 
-all functions / variables contained in the library are the following:
+<!-- all functions / variables contained in the library are the following:
 
 - `v2` - a function that takes a cvss version 2 string and returns an object containing the CVSS score and severity, and metrics.
 - `v3` - a function that takes a cvss version 3 string and returns an object containing the CVSS score and severity, and metrics.
-- `v4` - a function that takes a cvss version 4 string and returns an object containing the CVSS score and severity, and metrics.
+- `v4` - a function that takes a cvss version 4 string and returns an object containing the CVSS score and severity, and metrics. -->
 
 ### Prerequisites
 
@@ -179,7 +181,7 @@ This is an example of how to list things you need to use the software and how to
 
 <!-- Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources. -->
 
-_For more examples, please refer to the [Examples](./src/examples.pdf)_
+_Please refer to the [Docs](./cvssc/0.1.0/src/docs.pdf)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
