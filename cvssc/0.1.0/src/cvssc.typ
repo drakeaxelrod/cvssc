@@ -18,7 +18,7 @@
   "2.0": "https://www.first.org/cvss/v2/guide",
   "3.0": "https://www.first.org/cvss/v3.0/specification-document",
   "3.1": "https://www.first.org/cvss/v3.1/specification-document",
-  "4.0": "https://www.first.org/cvss/v4.0/specification-document"
+  "4.0": "https://www.first.org/cvss/v4.0/specification-document",
 )
 /// The version of this package.
 ///
@@ -32,7 +32,7 @@
 /// - s (string): The CVSS string to convert.
 /// -> dictionary
 #let str2vec(s) = {
-  if type(s) != "string" {
+  if type(s) != str {
     return ("error": "Input must be a string")
   }
   let re = regex("CVSS:([0-9.]+)/(.+)")
@@ -40,12 +40,15 @@
   let version = match.at("captures", default: ("4.0",)).at(0)
   let metrics = match.at("captures", default: ("",)).at(1)
   let pairs = metrics.split("/")
-  let result = pairs.fold((:), (c, it) => {
-    let pair = it.split(":")
-    let k = pair.at(0)
-    let v = pair.at(1)
-    c + ((k): v)
-  })
+  let result = pairs.fold(
+    (:),
+    (c, it) => {
+      let pair = it.split(":")
+      let k = pair.at(0)
+      let v = pair.at(1)
+      c + ((k): v)
+    },
+  )
   (version: version, metrics: result)
 }
 
@@ -69,10 +72,13 @@
   let version = vec.at("version", default: "4.0")
   let metrics = vec.at("metrics", default: (:))
   let result = "CVSS:" + version + "/"
-  result += metrics.pairs().map(it => {
-    let (k, v) = it
-    k + ":" + v
-  }).join("/")
+  result += metrics
+    .pairs()
+    .map(it => {
+      let (k, v) = it
+      k + ":" + v
+    })
+    .join("/")
   result
 }
 
@@ -84,14 +90,21 @@
 /// -> string
 #let kebab-case(string) = {
   import "@preview/t4t:0.3.2": assert
-  if type(string) != "string" { return ("error": "Input must be a string") }
-  string.codepoints().enumerate().fold((), (it, pair) => {
-    let (i, c) = pair
-    if c.match(regex("[A-Z]")) != none and i != 0 {
-      it.push("-")
-    }
-    it + (lower(c),)
-  }).join("")
+  if type(string) != str { return ("error": "Input must be a string") }
+  string
+    .codepoints()
+    .enumerate()
+    .fold(
+      (),
+      (it, pair) => {
+        let (i, c) = pair
+        if c.match(regex("[A-Z]")) != none and i != 0 {
+          it.push("-")
+        }
+        it + (lower(c),)
+      },
+    )
+    .join("")
 }
 
 /// This function converts the keys of a dictionary from camelCase to kebab-case. The input must be a dictionary.
@@ -106,11 +119,16 @@
 /// - input (dictionary): The dictionary to convert.
 /// -> dictionary
 #let kebabify-keys(input) = {
-  if type(input) != "dictionary" { return ("error": "Input must be a dictionary") }
-  input.pairs().fold((:), (it, pair) => {
-    let (k, v) = pair
-    it + ((kebab-case(k)): v)
-  })
+  if type(input) != dictionary { return ("error": "Input must be a dictionary") }
+  input
+    .pairs()
+    .fold(
+      (:),
+      (it, pair) => {
+        let (k, v) = pair
+        it + ((kebab-case(k)): v)
+      },
+    )
 }
 
 /// This function extracts the version from a CVSS string. The input must be a string in the format: `CVSS:([0-9.]+)/(.+)`
@@ -120,7 +138,7 @@
 /// - input (string): The CVSS string.
 /// -> string
 #let get-version(input) = {
-  if type(input) != "string" {
+  if type(input) != str {
     return ("error": "Input must be a string")
   }
   let re = regex("CVSS:([0-9.]+)/(.+)")
@@ -136,10 +154,10 @@
 /// - vec (string): The CVSS string or dictionary to convert.
 /// -> dictionary
 #let v2(vec) = {
-  if type(vec) == "dictionary" {
+  if type(vec) == dictionary {
     vec = vec2str(vec)
   }
-  if type(vec) != "string" {
+  if type(vec) != str {
     return ("error": "Input must be a string or a dictionary")
   }
   let result = cbor.decode(cvssc.v2(bytes(vec)))
@@ -175,10 +193,10 @@
 /// - vec (string): The CVSS string or dictionary to convert.
 /// -> dictionary
 #let v3(vec) = {
-  if type(vec) == "dictionary" {
+  if type(vec) == dictionary {
     vec = vec2str(vec)
   }
-  if type(vec) != "string" {
+  if type(vec) != str {
     return ("error": "Input must be a string or a dictionary")
   }
   let result = cbor.decode(cvssc.v3(bytes(vec)))
@@ -195,7 +213,7 @@
     result.insert("base-score", calc.round(result.at("base-score"), digits: 2))
   }
 
- result.insert("specification-document", specifications.at(result.version, default: first))
+  result.insert("specification-document", specifications.at(result.version, default: first))
   result
 }
 
@@ -206,10 +224,10 @@
 /// - vec (string): The CVSS string or dictionary to convert.
 /// -> dictionary
 #let v4(vec) = {
-  if type(vec) == "dictionary" {
+  if type(vec) == dictionary {
     vec = vec2str(vec)
   }
-  if type(vec) != "string" {
+  if type(vec) != str {
     return ("error": "Input must be a string or a dictionary")
   }
   let result = cbor.decode(cvssc.v4(bytes(vec)))
@@ -251,12 +269,10 @@
 /// - vec (string): The CVSS string or dictionary to convert.
 /// -> dictionary
 #let calc(vec) = {
-  if type(vec) == "dictionary" { vec = vec2str(vec) }
-  if type(vec) != "string" { return ("error": "Input must be a string or a dictionary") }
-  if get-version(vec) == "2.0" { return v2(vec) }
-  else if get-version(vec) == "3.0" { return v3(vec) }
-  else if get-version(vec) == "3.1" { return v3(vec) }
-  else if get-version(vec) == "4.0" { return v4(vec) }
-  else { return ("error": "Invalid version") }
+  if type(vec) == dictionary { vec = vec2str(vec) }
+  if type(vec) != str { return ("error": "Input must be a string or a dictionary") }
+  if get-version(vec) == "2.0" { return v2(vec) } else if get-version(vec) == "3.0" { return v3(vec) } else if (
+    get-version(vec) == "3.1"
+  ) { return v3(vec) } else if get-version(vec) == "4.0" { return v4(vec) } else { return ("error": "Invalid version") }
 }
 
