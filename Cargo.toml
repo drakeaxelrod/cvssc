@@ -9,13 +9,13 @@ license = "MIT"
 crate-type = ["cdylib"]
 
 [dependencies]
-nvd-cvss = "0.1.0"
+nvd-cvss = "0.1.1"
 # wasm-minimal-protocol = { git = "https://github.com/astrale-sharp/wasm-minimal-protocol" }
 wasm-minimal-protocol = { git = "https://github.com/astrale-sharp/wasm-minimal-protocol.git", version = "0.1.0" }
 serde = { version = "1", features = ["derive"] }
-serde_bytes = "0.11.12"
+serde_bytes = "0.11.15"
 anyhow = "1"
-ciborium = "0.2.1"
+ciborium = "0.2.2"
 
 [profile.dev]
 lto = 'thin'        # Enable link-time optimization
