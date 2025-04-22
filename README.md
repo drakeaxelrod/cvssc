@@ -240,7 +240,8 @@ Project Link: [https://github.com/DrakeAxelrod/cvssc](https://github.com/DrakeAx
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DrakeAxelrod"><img src="https://avatars.githubusercontent.com/u/51012876?v=4?s=64" width="64px;" alt="Drake Axelrod"/><br /><sub><b>Drake Axelrod</b></sub></a><br />
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DrakeAxelrod"><img src="https://avatars.githubusercontent.com/u/51012876?s=64" width="64px;" alt="Drake Axelrod"/><br /><sub><b>Drake Axelrod</b></sub></a><br />
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dwbzn"><img src="https://avatars.githubusercontent.com/u/35350794?s=64" width="64px;" alt="Drake Axelrod"/><br /><sub><b>dwbzn</b></sub></a><br />
     </tr>
   </tbody>
 </table>
