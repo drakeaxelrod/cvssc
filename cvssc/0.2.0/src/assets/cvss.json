@@ -1512,7 +1512,7 @@
             "label": "Critical",
             "min": 9.0,
             "max": 10.0,
-            "default_color": "#CC0500",
+            "default_color": "#DF3D03",
             "description": "Critical severity vulnerabilities represent severe or catastrophic risk and should be remediated immediately."
           }
         ],

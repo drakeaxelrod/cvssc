@@ -8,14 +8,14 @@
 /// Severity color palette
 /// Used for badges, graphs, and visual indicators
 #let severity-colors = (
-  "none": rgb("#0366d6"),      // Blue
-  "low": rgb("#28a745"),       // Green
-  "medium": rgb("#f66a0a"),    // Orange
-  "high": rgb("#d73a49"),      // Red
-  "critical": rgb("#6f42c1"),  // Purple
+  "none": rgb("#53AA33"),      // Blue
+  "low": rgb("#FFCB0D"),       // Green
+  "medium": rgb("#F9A009"),    // Orange
+  "high": rgb("#DF3D03"),      // Red
+  "critical": rgb("#DF3D03"),  // Purple
 )
 
-// ============================================================================
+// ============================= ===============================================
 // CHART COLORS
 // ============================================================================
 

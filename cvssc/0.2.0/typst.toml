@@ -2,7 +2,7 @@
 name = "cvssc"
 version = "0.2.0"
 entrypoint = "lib.typ"
-exclude = ["src/tests.typ"]
+exclude = ["tests.typ"]
 authors = ["Drake Axelrod <drakeaxelrod@gmail.com>"]
 license = "MIT"
 description = "Common Vulnerability Scoring System (CVSS) calculator library for Typst. Supports CVSS 2.0, 3.0, 3.1, and 4.0."
