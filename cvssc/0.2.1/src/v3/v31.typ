@@ -121,7 +121,7 @@
   let a-val = metrics.at("A", default: a.values.X).value
   
   // Check if base metrics are defined
-  if av-val == 1.0 or ac-val == 1.0 or c-val == 0.0 {
+  if av-val == 1.0 or ac-val == 1.0 {
     return none
   }
   

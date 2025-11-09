@@ -124,7 +124,7 @@
   let a-val = metrics.at("A", default: a.values.X).value
 
   // Check if base metrics are defined
-  if av-val == 1.0 or ac-val == 1.0 or c-val == 0.0 {
+  if av-val == 1.0 or ac-val == 1.0 {
     return none
   }
 
@@ -193,10 +193,10 @@
 #let calculate-modified-impact(miss, scope-changed) = {
   if scope-changed {
     // CVSS 3.0 formula: uses (miss - 0.02)^15
-    scope-unchanged-factor * miss
+    scope-changed-factor * (miss - 0.029) - 3.25 * calc.pow(miss - 0.02, 15)
   } else {
     // CVSS 3.0 formula: uses (miss - 0.02)^15
-    scope-changed-factor * (miss - 0.029) - 3.25 * calc.pow(miss - 0.02, 15)
+    scope-unchanged-factor * miss
   }
 }
 

@@ -285,52 +285,251 @@
 
 // ============================================================================
 // HIGHEST SEVERITY VECTORS FOR EACH EQ
+// Based on official CVSS v4.0 spec
 // ============================================================================
 
-#let eq1-max-vectors = (
-  "0": ("AV:N",),
-  "1": ("AV:A", "AV:N"),
-  "2": ("AV:P", "AV:L"),
+#let max-composed = (
+  eq1: (
+    "0": ("AV:N/PR:N/UI:N/",),
+    "1": ("AV:A/PR:N/UI:N/", "AV:N/PR:L/UI:N/", "AV:N/PR:N/UI:P/"),
+    "2": ("AV:P/PR:N/UI:N/", "AV:A/PR:L/UI:P/"),
+  ),
+  eq2: (
+    "0": ("AC:L/AT:N/",),
+    "1": ("AC:H/AT:N/", "AC:L/AT:P/"),
+  ),
+  eq3eq6: (
+    "00": ("VC:H/VI:H/VA:H/CR:H/IR:H/AR:H/",),
+    "01": ("VC:H/VI:H/VA:L/CR:M/IR:M/AR:H/", "VC:H/VI:H/VA:H/CR:M/IR:M/AR:M/"),
+    "10": ("VC:L/VI:H/VA:H/CR:H/IR:H/AR:H/", "VC:H/VI:L/VA:H/CR:H/IR:H/AR:H/"),
+    "11": ("VC:L/VI:H/VA:L/CR:H/IR:M/AR:H/", "VC:L/VI:H/VA:H/CR:H/IR:M/AR:M/",
+           "VC:H/VI:L/VA:H/CR:M/IR:H/AR:M/", "VC:H/VI:L/VA:L/CR:M/IR:H/AR:H/",
+           "VC:L/VI:L/VA:H/CR:H/IR:H/AR:M/"),
+    "21": ("VC:L/VI:L/VA:L/CR:H/IR:H/AR:H/",),
+  ),
+  eq4: (
+    "0": ("SC:H/SI:S/SA:S/",),
+    "1": ("SC:H/SI:H/SA:H/",),
+    "2": ("SC:L/SI:L/SA:L/",),
+  ),
+  eq5: (
+    "0": ("E:A/",),
+    "1": ("E:P/",),
+    "2": ("E:U/",),
+  ),
 )
 
-#let eq2-max-vectors = (
-  "0": ("AC:L",),
-  "1": ("AC:H", "AC:L"),
+#let max-severity = (
+  eq1: (
+    "0": 1,
+    "1": 4,
+    "2": 5,
+  ),
+  eq2: (
+    "0": 1,
+    "1": 2,
+  ),
+  eq3eq6: (
+    "00": 7,
+    "01": 6,
+    "10": 8,
+    "11": 8,
+    "21": 10,
+  ),
+  eq4: (
+    "0": 6,
+    "1": 5,
+    "2": 4,
+  ),
+  eq5: (
+    "0": 1,
+    "1": 1,
+    "2": 1,
+  ),
 )
 
-#let eq3-eq6-max-vectors = (
-  "00": ("VC:H",),
-  "01": ("VC:H",),
-  "10": ("VC:L", "VC:H"),
-  "11": ("VC:L", "VC:H"),
-  "20": (),
-  "21": ("VC:L",),
-)
-
-#let eq4-max-vectors = (
-  "0": ("SC:H",),
-  "1": ("SC:H",),
-  "2": ("SC:L",),
-)
-
-#let eq5-max-vectors = (
-  "0": ("CR:H",),
-  "1": ("CR:H",),
-  "2": ("CR:H",),
+// Metric level scores (lower is more severe)
+#let metric-levels = (
+  AV: (N: 0.0, A: 0.1, L: 0.2, P: 0.3),
+  PR: (N: 0.0, L: 0.1, H: 0.2),
+  UI: (N: 0.0, P: 0.1, A: 0.2),
+  AC: (L: 0.0, H: 0.1),
+  AT: (N: 0.0, P: 0.1),
+  VC: (H: 0.0, L: 0.1, N: 0.2),
+  VI: (H: 0.0, L: 0.1, N: 0.2),
+  VA: (H: 0.0, L: 0.1, N: 0.2),
+  SC: (H: 0.1, L: 0.2, N: 0.3),
+  SI: (S: 0.0, H: 0.1, L: 0.2, N: 0.3),
+  SA: (S: 0.0, H: 0.1, L: 0.2, N: 0.3),
+  CR: (H: 0.0, M: 0.1, L: 0.2),
+  IR: (H: 0.0, M: 0.1, L: 0.2),
+  AR: (H: 0.0, M: 0.1, L: 0.2),
 )
 
 // ============================================================================
 // SCORE CALCULATION
 // ============================================================================
 
+// Parse a max vector string into metrics
+#let parse-max-vector(vec-str) = {
+  let parts = vec-str.split("/").filter(p => p.len() > 0)
+  let result = (:)
+  for part in parts {
+    let kv = part.split(":")
+    if kv.len() == 2 {
+      result.insert(kv.at(0), kv.at(1))
+    }
+  }
+  result
+}
+
+// Get metric level score
+#let get-metric-level(metric, value) = {
+  if value == none or value == "X" {
+    return none
+  }
+  let levels = metric-levels.at(metric, default: none)
+  if levels == none {
+    return none
+  }
+  levels.at(value, default: none)
+}
+
+// Calculate severity distance between current vector and a max vector
+#let calc-severity-distance(current-metrics, max-vec-str, metric-keys) = {
+  let max-vec = parse-max-vector(max-vec-str)
+  let total = 0.0
+
+  for key in metric-keys {
+    let current-val = get-comparison-metric(current-metrics, key)
+    let max-val = max-vec.at(key, default: "X")
+
+    let current-level = get-metric-level(key, current-val)
+    let max-level = get-metric-level(key, max-val)
+
+    if current-level != none and max-level != none {
+      total = total + (current-level - max-level)
+    }
+  }
+
+  total
+}
+
+// Find the maximum severity vector for current metrics within an EQ
+#let find-max-vector(current-metrics, eq-key, eq-level) = {
+  let max-vecs = max-composed.at(eq-key, default: (:)).at(eq-level, default: ())
+
+  if max-vecs.len() == 0 {
+    return none
+  }
+
+  // Determine which metrics to check based on EQ
+  let metric-keys = if eq-key == "eq1" {
+    ("AV", "PR", "UI")
+  } else if eq-key == "eq2" {
+    ("AC", "AT")
+  } else if eq-key == "eq3eq6" {
+    ("VC", "VI", "VA", "CR", "IR", "AR")
+  } else if eq-key == "eq4" {
+    ("SC", "SI", "SA")
+  } else if eq-key == "eq5" {
+    ("E",)
+  } else {
+    ()
+  }
+
+  // Try each max vector and return the first valid one
+  // (where current metrics are not more severe than max)
+  for max-vec in max-vecs {
+    let distance = calc-severity-distance(current-metrics, max-vec, metric-keys)
+    if distance >= 0 {
+      return (vec: max-vec, distance: distance)
+    }
+  }
+
+  // If no valid vector found, use first one
+  if max-vecs.len() > 0 {
+    let max-vec = max-vecs.at(0)
+    return (
+      vec: max-vec,
+      distance: calc-severity-distance(current-metrics, max-vec, metric-keys)
+    )
+  }
+
+  none
+}
+
 // Calculate the next lower macro vector for a specific EQ
 #let derive-next-lower(macro-vec, eq-index) = {
   let digits = macro-vec.clusters()
 
-  if eq-index < 1 or eq-index > 6 { return macro-vec }
+  if eq-index < 1 or eq-index > 6 { return none }
+
+  // Special handling for EQ3 (combined with EQ6)
+  if eq-index == 3 {
+    let eq3-val = int(digits.at(2))
+    let eq6-val = int(digits.at(5))
+
+    // Based on RedHat's logic for EQ3+EQ6
+    if eq3-val == 1 and eq6-val == 1 {
+      // Increment EQ3
+      if eq3-val + 1 > 2 { return none }
+      let result = ""
+      for i in range(6) {
+        if i == 2 { result = result + str(eq3-val + 1) }
+        else { result = result + digits.at(i) }
+      }
+      return result
+    } else if eq3-val == 0 and eq6-val == 1 {
+      // Increment EQ3
+      let result = ""
+      for i in range(6) {
+        if i == 2 { result = result + str(eq3-val + 1) }
+        else { result = result + digits.at(i) }
+      }
+      return result
+    } else if eq3-val == 1 and eq6-val == 0 {
+      // Increment EQ6
+      if eq6-val + 1 > 1 { return none }
+      let result = ""
+      for i in range(6) {
+        if i == 5 { result = result + str(eq6-val + 1) }
+        else { result = result + digits.at(i) }
+      }
+      return result
+    } else if eq3-val == 0 and eq6-val == 0 {
+      // Take max of two options (handled in caller)
+      // For now, increment EQ6 (caller will handle both)
+      let result = ""
+      for i in range(6) {
+        if i == 5 { result = result + "1" }
+        else { result = result + digits.at(i) }
+      }
+      return result
+    } else {
+      // eq3=2, eq6=1: increment both
+      if eq3-val + 1 > 2 or eq6-val + 1 > 1 { return none }
+      let result = ""
+      for i in range(6) {
+        if i == 2 { result = result + str(eq3-val + 1) }
+        else if i == 5 { result = result + str(eq6-val + 1) }
+        else { result = result + digits.at(i) }
+      }
+      return result
+    }
+  }
 
   let current = digits.at(eq-index - 1)
-  let next = str(int(current) + 1)
+  let next-val = int(current) + 1
+
+  // Check if next level exists
+  if eq-index == 1 and next-val > 2 { return none }
+  if eq-index == 2 and next-val > 1 { return none }
+  if eq-index == 4 and next-val > 2 { return none }
+  if eq-index == 5 and next-val > 2 { return none }
+  if eq-index == 6 and next-val > 1 { return none }
+
+  let next = str(next-val)
 
   // Build new macro vector with updated digit
   let result = ""
@@ -348,51 +547,10 @@
 // Get score for next lower macro vector
 #let get-next-lower-score(macro-vec, eq-index) = {
   let next = derive-next-lower(macro-vec, eq-index)
-  macro-vector-lookup.at(next, default: 0.0)
-}
-
-// Calculate mean severity distances for all EQs
-#let calculate-severity-adjustments(metrics, macro-vec) = {
-  // For CVSS 4.0, severity distance calculation is complex
-  // This is a simplified version focusing on the key attributes
-
-  let adjustments = ()
-
-  // For each EQ, calculate the severity distance contribution
-  for eq-num in range(1, 7) {
-    let depth = get-eq-depth(eq-num, macro-vec.at(eq-num - 1))
-    if depth == 0 {
-      adjustments.push(0.0)
-      continue
-    }
-
-    // Calculate distance based on EQ type
-    let distance = 0
-
-    if eq-num == 1 {
-      // AV, PR, UI distances
-      distance = 0
-    } else if eq-num == 2 {
-      // AC, AT distances
-      distance = 0
-    } else if eq-num == 3 {
-      // VC, VI, VA distances
-      distance = 0
-    } else if eq-num == 4 {
-      // SC, SI, SA distances
-      distance = 0
-    } else if eq-num == 5 {
-      // E distance
-      distance = 0
-    } else if eq-num == 6 {
-      // CR, IR, AR distances
-      distance = 0
-    }
-
-    adjustments.push(distance)
+  if next == none {
+    return none
   }
-
-  adjustments
+  macro-vector-lookup.at(next, default: none)
 }
 
 // Round score to one decimal place with CVSS rounding
@@ -436,39 +594,134 @@
     return none
   }
 
-  // Calculate severity distance adjustments
-  let current-score = base-score
+  // Calculate severity distance adjustments for each EQ
+  let eq1-level = macro-vec.at(0)
+  let eq2-level = macro-vec.at(1)
+  let eq3-level = macro-vec.at(2)
+  let eq4-level = macro-vec.at(3)
+  let eq5-level = macro-vec.at(4)
+  let eq6-level = macro-vec.at(5)
 
-  // For each EQ, calculate adjustment based on severity distance
-  let total-adjustment = 0.0
-  let adjustment-count = 0
+  // Scale factor for max severity (as per CVSS v4.0 spec)
+  let step = 0.1
 
-  for eq-num in range(1, 7) {
-    let next-score = get-next-lower-score(macro-vec, eq-num)
-    let available-reduction = current-score - next-score
-    let depth = get-eq-depth(eq-num, macro-vec.at(eq-num - 1))
+  // Generate all possible max vector combinations (RedHat approach)
+  let eq1-maxes = max-composed.eq1.at(eq1-level, default: ())
+  let eq2-maxes = max-composed.eq2.at(eq2-level, default: ())
+  let eq36-key = eq3-level + eq6-level
+  let eq3eq6-maxes = max-composed.eq3eq6.at(eq36-key, default: ())
+  let eq4-maxes = max-composed.eq4.at(eq4-level, default: ())
+  let eq5-maxes = max-composed.eq5.at(eq5-level, default: ())
 
-    if depth > 0 and available-reduction > 0 {
-      // Simplified: assume we're at max severity for now
-      // In full implementation, would calculate actual severity distance
-      let severity-distance = 0
-      let percentage = severity-distance / depth
-      let normalized = percentage * available-reduction
+  // Find ONE max vector where all severity distances are >= 0
+  let combined-max-vec = none
+  for eq1-max in eq1-maxes {
+    for eq2-max in eq2-maxes {
+      for eq3eq6-max in eq3eq6-maxes {
+        for eq4-max in eq4-maxes {
+          for eq5-max in eq5-maxes {
+            let test-vec = eq1-max + eq2-max + eq3eq6-max + eq4-max + eq5-max
 
-      total-adjustment = total-adjustment + normalized
-      adjustment-count = adjustment-count + 1
+            // Calculate all severity distances for this combined vector
+            let all-metrics-keys = ("AV", "PR", "UI", "AC", "AT", "VC", "VI", "VA", "SC", "SI", "SA", "CR", "IR", "AR")
+            let all-valid = true
+            for key in all-metrics-keys {
+              let current-val = get-comparison-metric(metrics, key)
+              let max-metrics = parse-max-vector(test-vec)
+              let max-val = max-metrics.at(key, default: "X")
+
+              let current-level = get-metric-level(key, current-val)
+              let max-level = get-metric-level(key, max-val)
+
+              if current-level != none and max-level != none {
+                if current-level - max-level < 0 {
+                  all-valid = false
+                  break
+                }
+              }
+            }
+
+            if all-valid {
+              combined-max-vec = test-vec
+              break
+            }
+          }
+          if combined-max-vec != none { break }
+        }
+        if combined-max-vec != none { break }
+      }
+      if combined-max-vec != none { break }
+    }
+    if combined-max-vec != none { break }
+  }
+
+  // Use the single combined max vector to calculate all severity distances
+  let normalized-severities = ()
+  let n-existing-lower = 0
+
+  if combined-max-vec != none {
+    // EQ1: AV, PR, UI
+    let next-score = get-next-lower-score(macro-vec, 1)
+    if next-score != none and next-score <= base-score {
+      let distance = calc-severity-distance(metrics, combined-max-vec, ("AV", "PR", "UI"))
+      let max-sev = max-severity.eq1.at(eq1-level, default: 1) * step
+      let available = base-score - next-score
+      let normalized = (distance / max-sev) * available
+      normalized-severities.push(normalized)
+      n-existing-lower += 1
+    }
+
+    // EQ2: AC, AT
+    next-score = get-next-lower-score(macro-vec, 2)
+    if next-score != none and next-score <= base-score {
+      let distance = calc-severity-distance(metrics, combined-max-vec, ("AC", "AT"))
+      let max-sev = max-severity.eq2.at(eq2-level, default: 1) * step
+      let available = base-score - next-score
+      let normalized = (distance / max-sev) * available
+      normalized-severities.push(normalized)
+      n-existing-lower += 1
+    }
+
+    // EQ3+EQ6: VC, VI, VA, CR, IR, AR
+    next-score = get-next-lower-score(macro-vec, 3)
+    if next-score != none and next-score <= base-score {
+      let distance = calc-severity-distance(metrics, combined-max-vec, ("VC", "VI", "VA", "CR", "IR", "AR"))
+      let max-sev = max-severity.eq3eq6.at(eq36-key, default: 1) * step
+      let available = base-score - next-score
+      let normalized = (distance / max-sev) * available
+      normalized-severities.push(normalized)
+      n-existing-lower += 1
+    }
+
+    // EQ4: SC, SI, SA
+    next-score = get-next-lower-score(macro-vec, 4)
+    if next-score != none and next-score <= base-score {
+      let distance = calc-severity-distance(metrics, combined-max-vec, ("SC", "SI", "SA"))
+      let max-sev = max-severity.eq4.at(eq4-level, default: 1) * step
+      let available = base-score - next-score
+      let normalized = (distance / max-sev) * available
+      normalized-severities.push(normalized)
+      n-existing-lower += 1
+    }
+
+    // EQ5: E (always 0 for base score, but still counts in mean)
+    next-score = get-next-lower-score(macro-vec, 5)
+    if next-score != none and next-score <= base-score {
+      normalized-severities.push(0.0)
+      n-existing-lower += 1
     }
   }
 
-  let mean-adjustment = if adjustment-count > 0 {
-    total-adjustment / adjustment-count
+  // Calculate mean adjustment
+  let mean-adjustment = if n-existing-lower > 0 and normalized-severities.len() > 0 {
+    normalized-severities.sum() / n-existing-lower
   } else {
     0.0
   }
 
-  let final-score = current-score - mean-adjustment
+  let final-score = base-score - mean-adjustment
 
-  // Clamp to valid range
+  // Clamp to valid range and round
   if final-score < 0 {
     0.0
   } else if final-score > 10 {
