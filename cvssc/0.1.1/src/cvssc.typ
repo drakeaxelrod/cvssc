@@ -199,7 +199,7 @@
   if type(vec) != str {
     return ("error": "Input must be a string or a dictionary")
   }
-  let result = cbor.decode(cvssc.v3(bytes(vec)))
+  let result = cbor(cvssc.v3(bytes(vec)))
   let metrics = str2vec(vec)
 
   result.insert("metrics", metrics.metrics)
@@ -230,7 +230,7 @@
   if type(vec) != str {
     return ("error": "Input must be a string or a dictionary")
   }
-  let result = cbor.decode(cvssc.v4(bytes(vec)))
+  let result = cbor(cvssc.v4(bytes(vec)))
   let metrics = str2vec(vec)
 
   result.insert("metrics", metrics.metrics)
