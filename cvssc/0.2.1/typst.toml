@@ -10,4 +10,4 @@ repository = "https://github.com/drakeaxelrod/cvssc"
 keywords = ["cvss", "security", "vulnerability", "scoring"]
 categories = ["utility"]
 disciplines = ["computer-science"]
-compiler = "0.14.0"
+compiler = "0.12.0"
