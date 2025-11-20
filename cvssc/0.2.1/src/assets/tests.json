@@ -862,6 +862,21 @@
       "description": "Mixed case auto-detection",
       "vector": "Av:N/Ac:L/Pr:N/Ui:N/s:U/C:h/I:H/a:h",
       "expected": 9.8
+    },
+    {
+      "description": "No duplicate metrics - v3.1",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "expected": 9.8
+    },
+    {
+      "description": "No duplicate metrics - v4.0",
+      "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
+      "expected": 9.3
+    },
+    {
+      "description": "No duplicate metrics - v2.0",
+      "vector": "CVSS:2.0/AV:N/AC:L/Au:N/C:C/I:C/A:C",
+      "expected": 10.0
     }
   ]
 }

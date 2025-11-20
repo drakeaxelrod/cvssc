@@ -166,6 +166,20 @@
 
   // Parse metrics and normalise to uppercase
   let pairs = metrics-str.split("/")
+
+  // Check for duplicate metrics (case-insensitive)
+  let seen-metrics = ()
+  for pair-str in pairs {
+    let pair = pair-str.split(":")
+    if pair.len() != 2 { continue }
+    let metric-key = upper(pair.at(0))
+    if metric-key in seen-metrics {
+      panic("Duplicate metric '" + metric-key + "' found in vector")
+    }
+    seen-metrics.push(metric-key)
+  }
+
+  // Build metrics dictionary
   let result = pairs.fold(
     (:),
     (c, it) => {

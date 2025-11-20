@@ -96,6 +96,18 @@
 // VALIDATION FUNCTIONS
 // ============================================================================
 
+/// Validate that no duplicate metrics exist in the vector
+///
+/// - metrics-dict (dictionary): Dictionary of metric key-value pairs (should be normalised)
+/// -> none (panics on validation failure)
+#let validate-no-duplicate-metrics(metrics-dict) = {
+  // This function checks the dictionary for duplicate keys
+  // In Typst, dictionaries cannot have duplicate keys by design,
+  // so we need to check for duplicates during parsing before dict creation
+  // This function serves as a placeholder for the actual check in str2vec()
+  none
+}
+
 /// Validate that all metric keys exist in the CVSS specification
 ///
 /// - metrics-dict (dictionary): Dictionary of metric key-value pairs (should be normalised)
