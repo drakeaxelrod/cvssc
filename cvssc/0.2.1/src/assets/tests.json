@@ -831,5 +831,52 @@
       "vector": "CVSS:2.0/AV:N/AC:L/Au:N/C:N/I:N/A:C",
       "expected": 7.8
     }
+  ],
+  "validation": [
+    {
+      "description": "Case-insensitive v3.1 vector",
+      "vector": "av:n/ac:l/pr:n/ui:n/s:u/c:h/i:h/a:h",
+      "expected": 9.8
+    },
+    {
+      "description": "Case-insensitive with explicit version",
+      "vector": "cvss:3.1/av:n/ac:l/pr:n/ui:n/s:u/c:h/i:h/a:h",
+      "expected": 9.8
+    },
+    {
+      "description": "Auto-detect v3.1 from S and PR metrics",
+      "vector": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "expected": 9.8
+    },
+    {
+      "description": "Auto-detect v2.0 from Au metric",
+      "vector": "AV:N/AC:L/Au:N/C:C/I:C/A:C",
+      "expected": 10.0
+    },
+    {
+      "description": "Auto-detect v4.0 from AT metric",
+      "vector": "AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
+      "expected": 9.3
+    },
+    {
+      "description": "Mixed case auto-detection",
+      "vector": "Av:N/Ac:L/Pr:N/Ui:N/s:U/C:h/I:H/a:h",
+      "expected": 9.8
+    },
+    {
+      "description": "No duplicate metrics - v3.1",
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "expected": 9.8
+    },
+    {
+      "description": "No duplicate metrics - v4.0",
+      "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
+      "expected": 9.3
+    },
+    {
+      "description": "No duplicate metrics - v2.0",
+      "vector": "CVSS:2.0/AV:N/AC:L/Au:N/C:C/I:C/A:C",
+      "expected": 10.0
+    }
   ]
 }

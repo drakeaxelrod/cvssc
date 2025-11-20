@@ -85,6 +85,8 @@
 The **cvssc** library provides comprehensive support for calculating CVSS scores across all major versions (2.0, 3.0, 3.1, and 4.0). It includes:
 
 - **Auto-detection** of CVSS version from vector strings
+- **Input validation** with descriptive error messages
+- **Case-insensitive** input support
 - **Score calculations** with base, temporal, and environmental metrics
 - **Visual representations** via radar charts
 - **Severity badges** with color-coded display
@@ -228,6 +230,32 @@ Result objects include built-in display methods:
 // Extract version from CVSS string
 #let version = get-version("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")
 // version => "3.1"
+
+// Auto-detect version without prefix
+#let version = get-version("AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")
+// version => "3.1" (detected from S and PR metrics)
+```
+
+#### Validation
+
+Input validation happens automatically during calculation. Invalid vectors will panic with descriptive errors.
+
+```typ
+// Validation functions are also exported for manual use
+#import "@preview/cvssc:0.2.0": validate
+
+// Validate metrics manually
+#let metrics = ("AV": "N", "AC": "L", "PR": "N", "UI": "N", "S": "U", "C": "H", "I": "H", "A": "H")
+#let validated = validate(metrics, "3.1")  // Returns normalised metrics or panics
+```
+
+The library accepts case-insensitive input and vectors without version prefixes:
+
+```typ
+// All of these work
+#calc("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")  // Standard
+#calc("cvss:3.1/av:n/ac:l/pr:n/ui:n/s:u/c:h/i:h/a:h")  // Lowercase
+#calc("AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")           // Auto-detect
 ```
 
 #### String Utilities
@@ -310,13 +338,13 @@ Calculate CVSS 4.0 scores.
 ### Utility Functions
 
 #### `str2vec(s) -> dict`
-Parse CVSS string to dictionary with `version` and `metrics` fields.
+Parse CVSS string to dictionary with `version` and `metrics` fields. Case-insensitive, normalises to uppercase.
 
 #### `vec2str(vec) -> string`
 Convert CVSS dictionary to string.
 
 #### `get-version(input) -> string`
-Extract version from CVSS string.
+Extract or auto-detect version from CVSS string. Supports vectors without `CVSS:X.X/` prefix.
 
 #### `kebab-case(string) -> string`
 Convert camelCase string to kebab-case.

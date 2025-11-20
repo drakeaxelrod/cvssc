@@ -43,7 +43,8 @@
 #let calculate-base-score(metrics) = {
   let av-val = metrics.at("AV", default: none)
   let ac-val = metrics.at("AC", default: none)
-  let au-val = metrics.at("Au", default: none)
+  // Accept both "Au" (spec) and "AU" (normalized)
+  let au-val = metrics.at("Au", default: metrics.at("AU", default: none))
   let c-val = metrics.at("C", default: none)
   let i-val = metrics.at("I", default: none)
   let a-val = metrics.at("A", default: none)
@@ -107,7 +108,8 @@
 #let calculate-adjusted-base-score(metrics) = {
   let av-val = metrics.at("AV", default: none)
   let ac-val = metrics.at("AC", default: none)
-  let au-val = metrics.at("Au", default: none)
+  // Accept both "Au" (spec) and "AU" (normalized)
+  let au-val = metrics.at("Au", default: metrics.at("AU", default: none))
 
   if av-val == none or ac-val == none or au-val == none {
     return 0
@@ -203,7 +205,8 @@
     let a-val = metrics.at("A", default: none)
     let av-val = metrics.at("AV", default: none)
     let ac-val = metrics.at("AC", default: none)
-    let au-val = metrics.at("Au", default: none)
+    // Accept both "Au" (spec) and "AU" (normalized)
+    let au-val = metrics.at("Au", default: metrics.at("AU", default: none))
 
     if c-val != none and i-val != none and a-val != none {
       impact = round(calculate-impact(c-val.value, i-val.value, a-val.value), 1)
@@ -264,7 +267,7 @@
         component = av
       } else if metric-name == "AC" {
         component = ac
-      } else if metric-name == "Au" {
+      } else if metric-name == "Au" or metric-name == "AU" {
         component = au
       } else if metric-name == "C" {
         component = c

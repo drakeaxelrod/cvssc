@@ -70,9 +70,71 @@
     )
 }
 
+/// Extract version from CVSS string or auto-detect from metrics
+///
+/// Supports explicit version prefix (e.g., "CVSS:3.1/...") or automatic detection
+/// based on metric patterns when prefix is omitted.
+///
+/// #example(`get-version("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N")`)
+/// #example(`get-version("AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")`)
+///
+/// - input (string): The CVSS string
+/// -> string
+#let get-version(input) = {
+  if type(input) != str {
+    return ("error": "Input must be a string")
+  }
+
+  // Try to match explicit version prefix (case-insensitive)
+  let re-explicit = regex("(?i)CVSS:([0-9.]+)/(.+)")
+  let match = input.match(re-explicit)
+
+  if match != none {
+    // Explicit version found
+    return match.at("captures", default: ("4.0",)).at(0)
+  }
+
+  // No explicit version - auto-detect from metric patterns
+  // Extract all metric keys (normalise to uppercase)
+  let metric-keys = input.split("/").map(pair => {
+    let parts = pair.split(":")
+    if parts.len() == 2 {
+      upper(parts.at(0))
+    } else {
+      ""
+    }
+  }).filter(k => k != "")
+
+  // Check for version-specific indicator metrics
+  // Priority: v4.0 unique > v2.0 unique > v3.x unique (since v4 and v3 share some metrics)
+  let has-v4-unique = metric-keys.any(k => k in ("AT", "VC", "VI", "VA", "SC", "SI", "SA"))
+  let has-v2-unique = metric-keys.any(k => k == "AU")
+  let has-v3-indicators = metric-keys.any(k => k in ("S", "PR"))
+
+  // Check for conflicting v2 + v3/v4 indicators (Au is unique to v2.0)
+  if has-v2-unique and (has-v4-unique or has-v3-indicators) {
+    panic("Cannot determine CVSS version: conflicting version indicators detected in vector. Please specify version explicitly using 'CVSS:X.X/' prefix.")
+  }
+
+  // Return detected version (v4 takes priority over v3 since v4 includes some v3-like metrics)
+  if has-v4-unique {
+    "4.0"
+  } else if has-v2-unique {
+    "2.0"
+  } else if has-v3-indicators {
+    "3.1"  // Default to 3.1 for v3.x
+  } else {
+    panic("Cannot determine CVSS version from metrics. Please specify version explicitly using 'CVSS:X.X/' prefix.")
+  }
+}
+
 /// Convert CVSS string to dictionary with version and metrics
 ///
-/// #example(`str2vec("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")`)
+/// Supports both explicit version prefix and auto-detection.
+/// Normalises all metric keys and values to uppercase.
+///
+/// #example(`str2vec("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N")`)
+/// #example(`str2vec("AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")`)
 ///
 /// - s (string): The CVSS string to convert
 /// -> dictionary
@@ -80,24 +142,55 @@
   if type(s) != str {
     return ("error": "Input must be a string")
   }
-  let re = regex("CVSS:([0-9.]+)/(.+)")
+
+  // Try to extract version and metrics
+  let re = regex("(?i)CVSS:([0-9.]+)/(.+)")
   let match = s.match(re)
-  if match == none {
-    return ("error": "Invalid CVSS string format")
+
+  let version = none
+  let metrics-str = none
+
+  if match != none {
+    // Has explicit version prefix
+    version = match.at("captures", default: ("4.0",)).at(0)
+    metrics-str = match.at("captures", default: ("",)).at(1)
+  } else {
+    // No version prefix - will auto-detect
+    metrics-str = s
+    // Get version via auto-detection
+    version = get-version(s)
+    if type(version) == dictionary and version.at("error", default: none) != none {
+      return version  // Return error from get-version
+    }
   }
-  let version = match.at("captures", default: ("4.0",)).at(0)
-  let metrics-str = match.at("captures", default: ("",)).at(1)
+
+  // Parse metrics and normalise to uppercase
   let pairs = metrics-str.split("/")
+
+  // Check for duplicate metrics (case-insensitive)
+  let seen-metrics = ()
+  for pair-str in pairs {
+    let pair = pair-str.split(":")
+    if pair.len() != 2 { continue }
+    let metric-key = upper(pair.at(0))
+    if metric-key in seen-metrics {
+      panic("Duplicate metric '" + metric-key + "' found in vector")
+    }
+    seen-metrics.push(metric-key)
+  }
+
+  // Build metrics dictionary
   let result = pairs.fold(
     (:),
     (c, it) => {
       let pair = it.split(":")
       if pair.len() != 2 { return c }
-      let k = pair.at(0)
-      let v = pair.at(1)
+      let k = upper(pair.at(0))
+      let v = upper(pair.at(1))
       c + ((k): v)
     },
   )
+
   (version: version, metrics: result)
 }
 
@@ -128,25 +221,6 @@
     })
     .join("/")
   result
-}
-
-/// Extract version from CVSS string
-///
-/// #example(`get-version("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")`)
-///
-/// - input (string): The CVSS string
-/// -> string
-#let get-version(input) = {
-  if type(input) != str {
-    return ("error": "Input must be a string")
-  }
-  let re = regex("CVSS:([0-9.]+)/(.+)")
-  let match = input.match(re)
-  if match == none {
-    return "4.0"
-  }
-  let version = match.at("captures", default: ("4.0",)).at(0)
-  version
 }
 
 // Parse CVSS vector string to metrics dictionary (internal use)
