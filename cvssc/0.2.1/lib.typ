@@ -35,5 +35,8 @@
 // Re-export constants for user customization
 #import "src/constants.typ": severity-colors, chart-colors, specifications, get-severity-from-score
 
+// Re-export validation functions for external use
+#import "src/validation.typ": validate, validate-metric-keys, validate-metric-values, validate-required-base-metrics, normalise-metrics, get-valid-metrics, get-valid-values, get-required-base-metrics
+
 // Export library version
 #let cvss-version = toml("typst.toml").package.version

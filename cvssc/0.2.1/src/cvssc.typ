@@ -8,6 +8,8 @@
 #import "v4/calculator.typ" as cvss4-calc
 #import "visualization.typ": draw-v2-graph, draw-v3-graph, draw-v4-graph
 #import "constants.typ": severity-colors, chart-colors, specifications, get-severity-from-score
+#import "utils.typ": get-version, str2vec, vec2str, kebab-case, kebabify-keys
+#import "validation.typ": validate
 
 // ============================================================================
 // STATE MANAGEMENT - Configurable Colors
@@ -33,138 +35,9 @@
   })
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-/// Convert CVSS string to vector dictionary
-///
-/// #example(`str2vec("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N")`)
-///
-/// - s (string): The CVSS string to convert
-/// -> dictionary
-#let str2vec(s) = {
-  if type(s) != str {
-    return ("error": "Input must be a string")
-  }
-  let re = regex("CVSS:([0-9.]+)/(.+)")
-  let match = s.match(re)
-  if match == none {
-    return ("error": "Invalid CVSS string format")
-  }
-  let version = match.at("captures", default: ("4.0",)).at(0)
-  let metrics = match.at("captures", default: ("",)).at(1)
-  let pairs = metrics.split("/")
-  let result = pairs.fold(
-    (:),
-    (c, it) => {
-      let pair = it.split(":")
-      if pair.len() != 2 { return c }
-      let k = pair.at(0)
-      let v = pair.at(1)
-      c + ((k): v)
-    },
-  )
-  (version: version, metrics: result)
-}
-
-/// Convert CVSS dictionary to string
-///
-/// #example(```
-/// vec2str((
-///   version: "3.0",
-///   metrics: (
-///     "AV": "N", "AC": "L",
-///     "PR": "N", "UI": "N",
-///     "S": "U", "C": "N",
-///     "I": "N", "A": "N"
-///   )
-/// ))```)
-///
-/// - vec (dictionary): The CVSS dictionary to convert
-/// -> string
-#let vec2str(vec) = {
-  let version = vec.at("version", default: "4.0")
-  let metrics = vec.at("metrics", default: (:))
-  let result = "CVSS:" + version + "/"
-  result += metrics
-    .pairs()
-    .map(it => {
-      let (k, v) = it
-      k + ":" + v
-    })
-    .join("/")
-  result
-}
-
-/// Convert string from camelCase to kebab-case
-///
-/// #example(`kebab-case("helloWorld")`)
-///
-/// - string (string): The string to convert
-/// -> string
-#let kebab-case(string) = {
-  if type(string) != str { return ("error": "Input must be a string") }
-  string
-    .codepoints()
-    .enumerate()
-    .fold(
-      (),
-      (it, pair) => {
-        let (i, c) = pair
-        if c.match(regex("[A-Z]")) != none and i != 0 {
-          it.push("-")
-        }
-        it + (lower(c),)
-      },
-    )
-    .join("")
-}
-
-/// Convert dictionary keys from camelCase to kebab-case
-///
-/// #example(```
-/// kebabify-keys((
-///   "somethingElse": "else",
-///   "anotherThing": "thing",
-///   "helloWorld": "world"
-/// ))```)
-///
-/// - input (dictionary): The dictionary to convert
-/// -> dictionary
-#let kebabify-keys(input) = {
-  if type(input) != dictionary { return ("error": "Input must be a dictionary") }
-  input
-    .pairs()
-    .fold(
-      (:),
-      (it, pair) => {
-        let (k, v) = pair
-        it + ((kebab-case(k)): v)
-      },
-    )
-}
-
-/// Extract version from CVSS string
-///
-/// #example(`get-version("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N")`)
-///
-/// - input (string): The CVSS string
-/// -> string
-#let get-version(input) = {
-  if type(input) != str {
-    return ("error": "Input must be a string")
-  }
-  let re = regex("CVSS:([0-9.]+)/(.+)")
-  let match = input.match(re)
-  if match == none {
-    return "4.0"
-  }
-  let version = match.at("captures", default: ("4.0",)).at(0)
-  version
-}
-
-// Note: specifications and get-severity-from-score are now imported from constants.typ
+// Note: Utility functions (get-version, str2vec, vec2str, kebab-case, kebabify-keys)
+// are imported from utils.typ
+// Note: specifications and get-severity-from-score are imported from constants.typ
 
 // ============================================================================
 // RADAR CHART VISUALIZATION
@@ -412,7 +285,13 @@
   }
 
   let version = parsed.at("version", default: "2.0")
-  let metrics-dict = cvss2-calc.parse-vector(vec)
+
+  // Validate vector before calculation
+  let validated-metrics = validate(parsed.metrics, version)
+
+  // Reconstruct normalised vector string for calculator
+  let normalised-vec = vec2str((version: version, metrics: validated-metrics))
+  let metrics-dict = cvss2-calc.parse-vector(normalised-vec)
 
   let result = cvss2-calc.calculate-scores(metrics-dict)
 
@@ -450,10 +329,16 @@
   }
 
   let version = parsed.at("version", default: "3.1")
+
+  // Validate vector before calculation
+  let validated-metrics = validate(parsed.metrics, version)
+
+  // Reconstruct normalised vector string for calculator
+  let normalised-vec = vec2str((version: version, metrics: validated-metrics))
   let metrics-dict = if version == "3.0" {
-    cvss30-calc.parse-vector(vec)
+    cvss30-calc.parse-vector(normalised-vec)
   } else {
-    cvss31-calc.parse-vector(vec)
+    cvss31-calc.parse-vector(normalised-vec)
   }
 
   let result = if version == "3.0" {
@@ -495,7 +380,13 @@
   }
 
   let version = parsed.at("version", default: "4.0")
-  let metrics-dict = cvss4-calc.parse-vector(vec)
+
+  // Validate vector before calculation
+  let validated-metrics = validate(parsed.metrics, version)
+
+  // Reconstruct normalised vector string for calculator
+  let normalised-vec = vec2str((version: version, metrics: validated-metrics))
+  let metrics-dict = cvss4-calc.parse-vector(normalised-vec)
 
   let result = cvss4-calc.calculate-scores(metrics-dict)
 
